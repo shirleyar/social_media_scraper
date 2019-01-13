@@ -9,11 +9,16 @@ const axios = require('axios'),
 	_ = require('lodash'),
 	Promise = require('bluebird');
 
-axiosRetry(axios, {retries: consts.retries});
-
 class SiteConnector {
 	constructor() {
 		this.cookie = "";
+		this.axiosClient = axios.create();
+		axiosRetry(this.axiosClient, {
+			retries: 10,
+			retryDelay: (retryCount) => {
+				return retryCount * 500;
+			}
+		});
 	}
 
 	/*
@@ -28,9 +33,9 @@ class SiteConnector {
 			url: `${consts.siteUrl}/${consts.loginEndpoint}`,
 			data: {username, password}
 		};
-		return axios(options)
+		return this.axiosClient(options)
 			.then(response => {
-				if (response.status === httpStatusCodes.OK && _.get(response.headers, 'set-cookie[0]')) {
+				if (response.status === httpStatusCodes.OK && response.data.status === 'success') {
 					logger.info('Connected successfully to website');
 					this.cookie = _.get(response.headers, 'set-cookie[0]');
 				} else {
@@ -49,7 +54,7 @@ class SiteConnector {
 			url: `${consts.siteUrl}/${consts.userUrl}/${userId}`,
 			headers: {'Cookie': this.cookie}
 		};
-		return axios(options)
+		return this.axiosClient(options)
 			.then(response => {
 				if (response.status === httpStatusCodes.OK) {
 					return Promise.resolve(response.data);
@@ -79,19 +84,22 @@ class SiteConnector {
 				skip
 			}
 		};
-		return axios(options)
+		return this.axiosClient(options)
 			.then(response => {
-				assert(response.status === httpStatusCodes.OK, `Response from server has a faulty status: ${response.status}`);
-				followers = followers.concat(response.data.followers);
-				logger.debug(`So far ${followers.length} followers for user ${userId}`);
-				if (response.data.more) {
-					logger.debug(`Fetching more followers`);
-					return this.getFollowersRecursively(userId, followers, skip + response.data.followers.length);
-				} else {
-					logger.debug(`Done fetching followers for user ${userId}`);
-					return Promise.resolve(followers);
+					assert(response.status === httpStatusCodes.OK, `Response from server has a faulty status: ${response.status}`);
+					followers = followers.concat(response.data.followers);
+					logger.debug(`So far ${followers.length} followers for user ${userId}`);
+					if (response.data.more) {
+						logger.debug(`Fetching more followers`);
+						return new Promise((resolve, reject) => {
+							return setTimeout(() => resolve(this.getFollowersRecursively(userId, followers, skip + response.data.followers.length), 500));
+						});
+					} else {
+						logger.debug(`Done fetching followers for user ${userId}`);
+						return Promise.resolve(followers);
+					}
 				}
-			}).catch(error => {
+			).catch(error => {
 				// todo: error handling
 				console.log(error);
 			})

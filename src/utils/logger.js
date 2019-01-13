@@ -11,7 +11,7 @@ const logger = bunyan.createLogger(
 		level: consts.logLevel,
 		serializers: {
 			data: echoSerializer,
-			err: errorSerializer,
+			err: bunyan.stdSerializers.err,
 			res: bunyan.stdSerializers.res,
 		},
 	});
@@ -20,9 +20,9 @@ function echoSerializer(obj) {
 	return obj;
 }
 
-function errorSerializer(error) {
-	return {message, name, source, stack} = error;
-}
+// function errorSerializer(error) {
+// 	return {message, name, source, stack} = error;
+// }
 
 logger.fields={time: 0, level: 1, poll_id: 2, msg: 3};
 

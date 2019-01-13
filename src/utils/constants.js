@@ -8,6 +8,7 @@ module.exports = {
 	userUrl: 'api/user',
 	followersEndpoint: 'followers',
 
+	// ascii values for required chars
 	A: 65,
 	Z: 90,
 	a: 97,
