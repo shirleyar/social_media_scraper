@@ -47,7 +47,7 @@ class SiteConnector {
 			})
 	}
 
-	getBasicData(userId = 'me') {
+	getBasicData(userId) {
 		logger.debug(`Fetching basic info for user ${userId}`);
 		const options = {
 			method: 'get',
@@ -64,7 +64,7 @@ class SiteConnector {
 			})
 	}
 
-	getFollowers(userId = 'me') {
+	getFollowers(userId) {
 		return this.getFollowersRecursively(userId, [], 0)
 			.then(followers => {
 				logger.info(`Retrieved followers for user ${userId} successfully`);

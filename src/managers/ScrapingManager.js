@@ -5,29 +5,84 @@ const SiteConnector = require('../connectors/SiteConnector'),
 	errorHandler = require('../utils/errorHandler'),
 	logger = require('../utils/logger'),
 	consts = require('../utils/constants'),
+	MongoDb = require('../databases/MongoDb'),
 	assert = require('assert'),
 	_ = require('lodash');
 
 class scrapingManager {
 	constructor() {
 		this.connector = new SiteConnector();
+		this.mongodb = new MongoDb();
 	}
 
-	scrapeBookFace(username, password) {
-		return this.connector.login(username, password)
-			.then(() => {
-				return this.collectData()
-			}).catch(error => {
-				console.log(error); // todo: error handling
-			})
+	init(username, password) {
+		return Promise.all([
+			this.connector.login(username, password),
+			this.mongodb.init()
+		]).then(() => {
+			logger.info('Manager was initialized successfully');
+		}).catch(error => {
+			console.error(error); // todo: error handling
+		});
 	}
 
-	collectData() {
+	async scrapeBookFace() {
+		try {
+			await this.collectData();
+			console.log();
+		} catch (error) {
+			console.error(error); // todo: error handling
+
+		}
+	}
+
+	async collectData() {
+		try {
+			// initialize loop
+			const scrapedProfiles = [];
+			let firstScraped = await this.collectFirstUser();
+			let leftToScrape = firstScraped.followers;
+			scrapedProfiles.push(firstScraped.id);
+			// collect profiles in batches
+			while (leftToScrape.length > 0) {
+				let promises = [];
+				for (let i = 0; i < 150 && i < leftToScrape.length; i++) {
+					scrapedProfiles.push(leftToScrape[i].id);
+					promises.push(this.collectDataForUSer(leftToScrape[i].id));
+				}
+				for (let i = 0; i < 150 || i < leftToScrape.length; i++) {
+					leftToScrape.shift();
+				}
+				await Promise.all(promises)
+					.then(savedProfiles => {
+						savedProfiles = _.uniqBy(_.flatten(savedProfiles), 'id');
+						savedProfiles = savedProfiles.filter(profile => {
+							return !scrapedProfiles.includes(profile._id)
+						});
+						leftToScrape = _.unionBy(leftToScrape, savedProfiles, 'id');
+					}).catch(error => {
+						console.error(error); // todo: error handling
+					});
+			}
+		} catch (error) {
+			console.log(error); // todo: error handling
+		}
+	}
+
+	async collectFirstUser() {
+		try {
+			return await this.collectDataForUSer('me');
+		} catch (error) {
+			console.error(error); // todo: error handling
+		}
+	}
+
+	collectDataForUSer(userId) {
 		let data = {};
 		let followers;
 		let promises = [
-			this.connector.getBasicData(),
-			this.connector.getFollowers()
+			this.connector.getBasicData(userId),
+			this.connector.getFollowers(userId)
 		];
 		return Promise.all(promises)
 			.then(results => {
@@ -35,11 +90,11 @@ class scrapingManager {
 				return basicDataExtractor(results[0])
 			}).then(basicData => {
 				data = basicData;
-				return this.getFollowedByUser(followers, basicData.id)
-			}).then(followed => {
-				data.following = followed;
 				data.followers = followers;
-				return data;
+				return this.mongodb.saveProfile(data)
+			}).then(saved => {
+				logger.info(`Saved collected data for user ${userId}`);
+				return {followers: saved._doc.followers, id: saved._doc._id}
 			}).catch(error => {
 				console.log(error); // todo: error handling
 			});
@@ -56,7 +111,7 @@ class scrapingManager {
 			let promises = [];
 			for (let i = 0; i < 150 && i < leftToCheck.length; i++) {
 				checked.push(leftToCheck[i].id);
-				promises.push(this.checkUser(leftToCheck[i], following, userIdOrigin));
+				// promises.push(this.checkUser(leftToCheck[i], following, userIdOrigin));
 			}
 			for (let i = 0; i < 150 || i < leftToCheck.length; i++) {
 				leftToCheck.shift();

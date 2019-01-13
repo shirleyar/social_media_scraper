@@ -15,4 +15,12 @@ module.exports = {
 	z: 122,
 	0: 48,
 	9: 57,
+
+	// DB constants
+	dbUrl: 'mongodb://<dbuser>:<dbpassword>@ds255754.mlab.com:55754/bookface',
+	dbUser: 'shirar486W',
+	dbPass: 'shirar486W',
+	dbName: 'bookface',
+	dbCollection: 'profiles',
+
 };
