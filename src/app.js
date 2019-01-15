@@ -40,11 +40,12 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 function gracefulShutdown(code) {
-	logger.info(`App is about to exit with code ${code}.Starting shutdown.`);
+	logger.info(`App is about to exit with code ${code}. Starting shutdown.`);
 	logger.info(`App will exit in ${consts.gracefulShutdownSec} seconds (graceful shutdown procedure)`);
 	MongoDb.close();
 	setTimeout(() => {
-		process.exit(code)
+		logger.info('Bye bye');
+		process.exit(code);
 	}, 10 * 1000);
 }
 

@@ -40,11 +40,12 @@ class SiteConnector {
 					logger.info('Connected successfully to website');
 					this.cookie = _.get(response.headers, 'set-cookie[0]');
 				} else {
+					logger.error({err: error}, 'Error during login to website');
 					return Promise.reject(response);
 				}
 			}).catch(error => {
 				logger.error({err: error}, 'Error during login to website');
-				throw error;
+				return Promise.reject(error);
 			})
 	}
 

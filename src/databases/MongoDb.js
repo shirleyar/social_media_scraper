@@ -15,13 +15,16 @@ mongoose.connection.on('error', error => {
 	throw error;
 });
 
+mongoose.connection.once('open', () => {
+	logger.info('Connected successfully to MongoDb server');
+});
+
 class MongoDb {
 	// initializes the connection to the database server (stored in mLab)
 	// since currently stored data is irrelevant in current scrape - the db is cleared each time.
 	static async init() {
 		try {
 			await MongoDb.connect();
-			logger.info('Connected successfully to MongoDb server');
 			await MongoDb.clearCollection();
 			logger.info('MongoDb cleared all documents');
 		} catch (error) {
@@ -103,7 +106,7 @@ class MongoDb {
 	// closes the connection to the database when done
 	static close() {
 		mongoose.connection.close(false, () => {
-			logger.info('MongoDb connection closed');
+			logger.info('MongoDb connection is close');
 		});
 	}
 }
