@@ -125,7 +125,7 @@ class scrapingManager {
 				lastName: profile.lastName,
 				age: profile.age,
 				followers: profile.followers,
-				following: await MongoDb.getAllfollowedByUser(profile._id)  // add a list of profiles that the current profile is following
+				following: await MongoDb.getAllFollowedByUser(profile._id)  // add a list of profiles that the current profile is following
 			}));
 		} catch (error) {
 			logger.error({err: error}, 'Error during fetching profiles / computing followed by user list');
@@ -159,7 +159,8 @@ class scrapingManager {
 					});
 					leftToCheck = _.unionBy(leftToCheck, discoveredUsers, 'id');
 				}).catch(error => {
-					console.error(error); // todo: error handling
+					logger.error({err: error}, '');
+					throw error;
 				});
 		}
 		return following

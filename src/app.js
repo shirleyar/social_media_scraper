@@ -23,7 +23,7 @@ function start() {
 			return resultsWriter(data) // write results to json file
 		}).then(() => {
 			logger.info('Scraping process has completed successfully');
-			process.exit();
+			gracefulShutdown(0);
 		}).catch(error => {
 			throw error;
 		});
@@ -31,20 +31,21 @@ function start() {
 
 process.on('uncaughtException', error => {
 	logger.fatal({err: error}, 'Error has occurred. App will exit now');
-	process.exit(-1);
+	gracefulShutdown(consts.unhandledExceptionCode);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-	logger.fatal({reason, promise}, 'Error has occurred. App will exit now');
-	process.exit(-1);
+	logger.fatal({promise}, 'Error has occurred. App will exit now');
+	gracefulShutdown(consts.unhandledRejectionCode);
 });
 
-// graceful shutdown
-process.on('exit', code => {
-	logger.info(`App is about to exit with code ${code}`);
+function gracefulShutdown(code) {
+	logger.info(`App is about to exit with code ${code}.Starting shutdown.`);
+	logger.info(`App will exit in ${consts.gracefulShutdownSec} seconds (graceful shutdown procedure)`);
 	MongoDb.close();
-	logger.info(`App will wait ${consts.gracefulShutdownSec} seconds and exit (graceful shutdown)`)
-	setTimeout(() => process.exit(), consts.gracefulShutdownSec * 1000);
-});
+	setTimeout(() => {
+		process.exit(code)
+	}, 10 * 1000);
+}
 
 start();

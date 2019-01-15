@@ -4,6 +4,7 @@ const fs = require('fs'),
 	logger = require('./logger'),
 	consts = require('./constants');
 
+// writes all scraped data to a json file.
 async function writeToFile(results) {
 	results = JSON.stringify(results, null, 2); // make a pretty json string
 	try {

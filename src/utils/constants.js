@@ -7,6 +7,8 @@ module.exports = {
 	scrapeBatchesAmount: 150,
 	gracefulShutdownSec: 5,
 	resultsPath: 'scrapedProfiles.json',
+	unhandledRejectionCode: -1,
+	unhandledExceptionCode: -2,
 
 	// BookFace related
 	siteUrl: process.env.SITE_URL || 'http://35.188.78.78:8888',
@@ -14,6 +16,8 @@ module.exports = {
 	userUrl: 'api/user',
 	followersEndpoint: 'followers',
 	siteRetries: 5,
+	siteTimeout: 13500,
+	delayBetweenFollowersBatch: 500,
 
 	// ascii values for required chars
 	A: 65,
@@ -23,11 +27,10 @@ module.exports = {
 	0: 48,
 	9: 57,
 
-	// DB constants   (generally should be a secret)
-	dbUrl: 'mongodb://<dbuser>:<dbpassword>@ds255754.mlab.com:55754/bookface',
-	dbUser: 'shirar486W',
-	dbPass: 'shirar486W',
-	dbName: 'bookface',
-	dbCollection: 'profiles',
-
+	// DB constants   (generally should be a secret and of course not documented)
+	dbUrl: process.env.DB_URL,
+	dbUser: process.env.DB_USER,
+	dbPass: process.env.DB_PASS,
+	dbName: process.env.DB_NAME,
+	dbCollection: process.env.DB_COLLECTION,
 };
