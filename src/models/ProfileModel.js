@@ -3,11 +3,28 @@
 const mongoose = require('mongoose');
 
 const profileStructure = {
-	_id: String,
-	firstName: String,
-	lastName: String,
-	favoriteColorRGB: Object,
-	age: { type: Number, min: 0, max: 120 },
+	_id: {
+		type: String,
+		required: true
+	},
+	firstName: {
+		type: String,
+		required: true
+	},
+	lastName: {
+		type: String,
+		required: true
+	},
+	favoriteColorRGB: {
+		type: Object,
+		required: true
+	},
+	age:
+		{ type: Number,
+			min: 0,
+			max: 120,
+			required: true
+		},
 	followers: [Object]
 };
 

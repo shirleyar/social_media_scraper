@@ -1,8 +1,7 @@
 'use strict';
 
 const bunyan = require('bunyan'),
-	consts = require('./constants'),
-	_ = require('lodash');
+	consts = require('./constants');
 
 const logger = bunyan.createLogger(
 	{
@@ -10,21 +9,13 @@ const logger = bunyan.createLogger(
 		src: true,
 		level: consts.logLevel,
 		serializers: {
-			data: echoSerializer,
+			profiles: profiles=> JSON.stringify(profiles),
 			err: bunyan.stdSerializers.err,
 			res: bunyan.stdSerializers.res,
 		},
 	});
 
-function echoSerializer(obj) {
-	return obj;
-}
-
-// function errorSerializer(error) {
-// 	return {message, name, source, stack} = error;
-// }
-
-logger.fields={time: 0, level: 1, poll_id: 2, msg: 3};
+logger.fields = {time: 0, level: 1, msg: 2};
 
 module.exports = logger;
 

@@ -14,9 +14,9 @@ class SiteConnector {
 		this.cookie = "";
 		this.axiosClient = axios.create();
 		axiosRetry(this.axiosClient, {
-			retries: 10,
+			retries: consts.siteRetries,
 			retryDelay: (retryCount) => {
-				return retryCount * 500;
+				return retryCount * 100;
 			}
 		});
 	}
@@ -25,11 +25,12 @@ class SiteConnector {
 	Logs in the social media website using the given username and password and returns the cookie token that was created in the website,
 	 */
 	login(username, password) {
-		assert(username);
-		assert(password);
+		assert(username, 'username is empty');
+		assert(password, 'password is empty');
 		logger.debug('Logging in to website');
 		const options = {
 			method: 'post',
+			timeout: 180000,
 			url: `${consts.siteUrl}/${consts.loginEndpoint}`,
 			data: {username, password}
 		};
@@ -51,6 +52,7 @@ class SiteConnector {
 		logger.debug(`Fetching basic info for user ${userId}`);
 		const options = {
 			method: 'get',
+			timeout: 180000,
 			url: `${consts.siteUrl}/${consts.userUrl}/${userId}`,
 			headers: {'Cookie': this.cookie}
 		};
@@ -82,7 +84,8 @@ class SiteConnector {
 			headers: {'Cookie': this.cookie},
 			params: {
 				skip
-			}
+			},
+			timeout: 180000,
 		};
 		return this.axiosClient(options)
 			.then(response => {

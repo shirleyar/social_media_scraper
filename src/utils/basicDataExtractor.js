@@ -2,7 +2,6 @@
 
 const consts = require('./constants'),
 	logger = require('./logger'),
-	errorHandler = require('./errorHandler'),
 	_ = require('lodash'),
 	Promise = require('bluebird'),
 	assert = require('assert');
@@ -13,7 +12,7 @@ goog.require('goog.crypt.base64');
 * Basic data is partially encoded to Base64. The function decodes it and returns the user's is, name, age, and favorite RGB color.
 */
 function extractBasicData(data) {
-	assert(!_.isEmpty(data), 'data is not valid');
+	assert(data, 'data is not valid');
 	return new Promise((resolve, reject) => {
 			try {
 				const userId = {value: undefined};
@@ -75,6 +74,7 @@ function extractBasicData(data) {
 		return i + 1;
 	}
 
+	// Will extract RGB color from the btyes array. currently will extract the B value.
 	function extractColor(bytes, i, favoriteColor) {
 		favoriteColor.b = bytes[++i];
 		favoriteColor.g = bytes[++i];
