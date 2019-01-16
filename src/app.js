@@ -39,6 +39,13 @@ process.on('unhandledRejection', (reason, promise) => {
 	gracefulShutdown(consts.unhandledRejectionCode);
 });
 
+['SIGHUP', 'SIGTERM','SIGINT'].forEach(signal => {
+	process.on(signal, () => {
+		logger.fatal(`Received signal ${signal}. App will exit now`);
+		gracefulShutdown(consts.killSignal);
+	});
+});
+
 function gracefulShutdown(code) {
 	logger.info(`App is about to exit with code ${code}. Starting shutdown.`);
 	logger.info(`App will exit in ${consts.gracefulShutdownSec} seconds (graceful shutdown procedure)`);

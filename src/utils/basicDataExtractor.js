@@ -25,9 +25,9 @@ function extractBasicData(data) {
 				const bytes = goog.crypt.base64.decodeStringToByteArray(data);
 				let i = 0;
 				//skip preceding blank chars. order is based on the returned string pattern.
-				i = extractUnicode(bytes, i, userId);
-				i = extractUnicode(bytes, i, fName);
-				i = extractUnicode(bytes, i, lName);
+				i = extractAlphaNum(bytes, i, userId);
+				i = extractAlphaNum(bytes, i, fName);
+				i = extractAlphaNum(bytes, i, lName);
 				i = extractAge(bytes, i, age);
 				i = extractColor(bytes, i, favoriteColor);  // for readability, maintainability and consistency purposes
 				resolve({
@@ -59,7 +59,7 @@ function extractBasicData(data) {
 	}
 
 	// extracts strings such as names and id. Returns the index of the next byte to process after the extracted info.
-	function extractUnicode(bytes, i, field) {
+	function extractAlphaNum(bytes, i, field) {
 		i = skipBlankChars(bytes, i);
 		let str = '';
 		while (i < bytes.length && !isBlankChar(bytes[i])) {

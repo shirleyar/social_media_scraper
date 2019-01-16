@@ -9,6 +9,7 @@ module.exports = {
 	resultsPath: 'scrapedProfiles.json',
 	unhandledRejectionCode: -1,
 	unhandledExceptionCode: -2,
+	killSignal: 128,
 
 	// BookFace related
 	siteUrl: process.env.SITE_URL || 'http://35.188.78.78:8888',
