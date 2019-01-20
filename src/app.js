@@ -20,7 +20,8 @@ function start() {
 		.then(() => {
 			return m.scrapeBookFace()
 		}).then(data => {
-			// return resultsWriter(data) // write results to json file
+			logger.info(`Writing scraped data to file ${consts.resultsPath}`);
+			return resultsWriter(data) // write results to json file
 		}).then(() => {
 			logger.info('Scraping process has completed successfully');
 			gracefulShutdown(0);

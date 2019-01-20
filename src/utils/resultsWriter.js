@@ -12,7 +12,7 @@ async function writeToFile(results) {
 			if (error) {
 				throw error;
 			}
-			logger.info(`Wrote results to file ./${consts.resultsPath} successfully.`);
+			logger.info(`Wrote results to file  ${consts.resultsPath} successfully.`);
 		});
 	} catch (error) {
 		logger.error({err: error}, 'Error during writing results to file');

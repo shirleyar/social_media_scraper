@@ -15,7 +15,7 @@ class LokiDB {
 	// initializes a Lokijs database (in memory javascript database. for reference:  http://lokijs.org/#/)
 	init() {
 		try {
-			this.database = new lokijs(consts.resultsPath, {
+			this.database = new lokijs(consts.databasePath, {
 				autosave: true,
 				autosaveInterval: consts.autosaveInterval
 			});
@@ -41,7 +41,13 @@ class LokiDB {
 		});
 	}
 
-	// inserts a new profile to database. Gets all Handles duplicates as well.
+	/* inserts a new profile to database. Gets all Handles duplicates as well.
+	id - uuid (String)
+	firstName, lastName - Strings
+	age - Number
+	favoriteColor - object {r, g, b (Numbers)}
+	followers - Array that each item is an object {id, firstName, lastName}
+	*/
 	async insertProfile({id, firstName, lastName, age, favoriteColor, followers}) {
 		try {
 			assert(!_.isEmpty(id), 'id is invalid');
@@ -86,6 +92,7 @@ class LokiDB {
 	// returns a profiles by it's id. if not found - returns undefined
 	async getProfileById(id) {
 		try {
+			assert(!_.isEmpty(id), 'id is invalid');
 			return Promise.resolve(this.profiles.find({id})[0]);
 		} catch (error) {
 			logger.error({err: error}, `Error occurred while fetching user ${id} from database`);
@@ -93,8 +100,10 @@ class LokiDB {
 		}
 	}
 
+	// returns an array of all profiles that user (with given id) is in their followers.
 	async getProfilesFollowedByUser(id) {
 		try {
+			assert(!_.isEmpty(id), 'id is invalid');
 			const existsProfile = await this.getProfileById(id);
 			if (existsProfile) {
 				let followed = this.profiles.where(profile => {
@@ -120,8 +129,12 @@ class LokiDB {
 		}
 	}
 
+	// for the user id, update the database with a list of profiles that the user is following with the 'following parameter
+	// the array contains objects in the structure of {id, firstName, lastName}
 	async updateFollowedByUserInDatabase(id, following) {
 		try {
+			assert(!_.isEmpty(id), 'id is invalid');
+			assert(!_.isEmpty(following) && Array.isArray(following), 'following is invalid');
 			let profile = await this.getProfileById(id);
 			profile.following = following;
 			this.profiles.update(profile);

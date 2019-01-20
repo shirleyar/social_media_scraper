@@ -6,7 +6,7 @@ module.exports = {
 	retries: parseInt(process.env.RETRIES) || 5,
 	scrapeBatchesAmount: 50,
 	gracefulShutdownSec: 5,
-	resultsPath: 'scrapedProfiles.json',
+	resultsPath: './scrapedProfiles.json',
 	unhandledRejectionCode: -1,
 	unhandledExceptionCode: -2,
 	killSignal: 128,
@@ -31,5 +31,5 @@ module.exports = {
 	// DB constants   (generally should be a secret and of course not documented)
 	collectionName:'profiles',
 	autosaveInterval: 2000,
-	databasePath: 'profilesdb.json'
+	databasePath: './profilesdb.json'
 };
