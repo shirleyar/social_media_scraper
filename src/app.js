@@ -7,7 +7,7 @@ require('babel-register')({
 });
 
 const Manager = require('./managers/ScrapingManager'),
-	MongoDb = require('./databases/MongoDb'),
+	LokiDb = require('./databases/LokiDB'),
 	logger = require('./utils/logger'),
 	consts = require('./utils/constants'),
 	resultsWriter = require('./utils/resultsWriter'),
@@ -20,7 +20,7 @@ function start() {
 		.then(() => {
 			return m.scrapeBookFace()
 		}).then(data => {
-			return resultsWriter(data) // write results to json file
+			// return resultsWriter(data) // write results to json file
 		}).then(() => {
 			logger.info('Scraping process has completed successfully');
 			gracefulShutdown(0);
@@ -30,12 +30,12 @@ function start() {
 }
 
 process.on('uncaughtException', error => {
-	logger.fatal({err: error}, 'Error has occurred. App will exit now');
+	logger.fatal({err: error}, 'Error has occurred (uncaughtException). App will exit now');
 	gracefulShutdown(consts.unhandledExceptionCode);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-	logger.fatal({promise}, 'Error has occurred. App will exit now');
+	logger.fatal({promise}, 'Error has occurred (unhandledRejection). App will exit now');
 	gracefulShutdown(consts.unhandledRejectionCode);
 });
 
@@ -49,11 +49,11 @@ process.on('unhandledRejection', (reason, promise) => {
 function gracefulShutdown(code) {
 	logger.info(`App is about to exit with code ${code}. Starting shutdown.`);
 	logger.info(`App will exit in ${consts.gracefulShutdownSec} seconds (graceful shutdown procedure)`);
-	MongoDb.close();
+	LokiDb.close();
 	setTimeout(() => {
 		logger.info('Bye bye');
 		process.exit(code);
-	}, 10 * 1000);
+	}, consts.gracefulShutdownSec * 1000);
 }
 
 start();

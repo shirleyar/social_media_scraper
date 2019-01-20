@@ -11,8 +11,8 @@ const logger = bunyan.createLogger(
 		serializers: {
 			savedDoc: savedDoc=>JSON.stringify(savedDoc),
 			profiles: profiles=> JSON.stringify(profiles),
-			err: bunyan.stdSerializers.err,
-			res: bunyan.stdSerializers.res,
+			error: bunyan.stdSerializers.err,
+			response: bunyan.stdSerializers.res,
 		},
 	});
 
