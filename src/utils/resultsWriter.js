@@ -6,7 +6,7 @@ const fs = require('fs'),
 
 // writes all scraped data to a json file.
 async function writeToFile(results) {
-	results = JSON.stringify(results, null, 2); // make a pretty json string
+	results = JSON.stringify(results, null, '\t'); // make a pretty json string
 	try {
 		await fs.writeFile(consts.resultsPath, results, {flag: 'w+'}, error => {
 			if (error) {

@@ -16,5 +16,7 @@ In order to use the script either run (in terminal, CWD should be project's path
 OR     
 `node ./src/app.js <username> <password>`
 
+All scraped data is saved in a json file: `./scrapedProfiles.json`
+
 ## Open issues
 * favorite color decode need some more work. Decoded B value. Use of masks (hex FF0000, FF00) were no use. Need to check the relations between the returned values and the RGB in the website.

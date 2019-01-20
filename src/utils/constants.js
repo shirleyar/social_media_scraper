@@ -5,7 +5,7 @@ module.exports = {
 	logLevel: process.env.LOG_LEVEL || 'info',
 	retries: parseInt(process.env.RETRIES) || 5,
 	scrapeBatchesAmount: 50,
-	gracefulShutdownSec: 5,
+	gracefulShutdownSec: 10,
 	resultsPath: './scrapedProfiles.json',
 	unhandledRejectionCode: -1,
 	unhandledExceptionCode: -2,
